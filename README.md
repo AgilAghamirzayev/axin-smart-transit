@@ -1,5 +1,16 @@
 # Axın — Smart Transit & Crowdsourcing Engine
 
+## Əvvəlcə videolara baxın / Watch first
+
+Layihəni tez anlamaq üçün əvvəl funksional tanıtıma, sonra texniki izaha baxın. Hər iki video ingiliscə səsləndirmə və ekrandakı altyazılarla təqdim olunur.
+
+| 1. Funksional tanıtım · təxminən 1:30 | 2. Texniki arxitektura · təxminən 2:00 |
+|---|---|
+| [▶ Product walkthrough](https://www.youtube.com/watch?v=2UjGJyB7614) | [▶ Technical walkthrough](https://www.youtube.com/watch?v=SDBAZGnlSqA) |
+| Səfər seçimi, xəritə, ETA, sıxlıq bildirişi və operator təyinatı | Next.js → API proxy → Spring Boot → DB, feature-based struktur, ETA/analitika və transaction axını |
+
+**Nümayişdə avtobus hərəkəti və dispatch simulyasiyadır; ETA təxminidir.** [Video mətnləri və altyazılar](docs/videos/) repoda saxlanılır.
+
 **Digital Challenge Azerbaijan 2026 · Yarımfinal · 31.10.2026**
 
 Bakı üçün səfər planlayıcısı, hərəkətli avtobus xəritəsi, sərnişin sıxlıq bildirişləri və operator analitikası. Java/Spring Boot və Next.js/TypeScript tətbiqləri feature-based strukturla hazırlanıb.

@@ -1,0 +1,26 @@
+ARCHITECTURE
+Axin uses a Next.js frontend, a modular Spring Boot backend, and a database. Here is how a request flows through the system.
+
+01 / FRONTEND
+The frontend groups code by feature. React components handle journeys, maps, and operator tools. Shared shadcn components provide controls, while Leaflet displays routes and markers.
+
+02 / API FLOW
+Browser requests pass through a same-origin Next.js proxy to Spring Boot. The proxy restricts paths and applies timeouts. Live snapshots refresh every three seconds.
+
+03 / BACKEND
+Backend packages follow business features. Controllers handle requests, services coordinate operations, and policies calculate rules. Repositories handle database access, with some services also using JDBC directly.
+
+04 / PERSISTENCE
+Flyway manages database migrations. The catalog loads from versioned open data. Reports, alerts, vehicles, and assignments persist. Transactions and idempotency help prevent duplicate writes.
+
+05 / JOURNEY ENGINE
+The journey engine checks nearby stops and directed route geometry. It prioritizes fewer boardings. Arrival estimates add walking, simulated waiting, riding, and transfer time, without live traffic.
+
+06 / ANALYTICS
+Analytics combines fresh GPS with recent, unique crowd reports. Configurable thresholds determine crowding. Sustained high crowding for ten minutes creates an alert; stale or insufficient evidence resets continuity.
+
+07 / OPERATIONS
+Operator and GPS endpoints use separate roles. Dispatch validates the line, full trajectory, and reserve bus. A transaction protects assignment, saves history, and starts the simulated vehicle.
+
+ENGINEERING / LIMITS
+Unit, integration, and browser tests are included, although the latest full suite was not rerun. Real GPS, schedules, and calibrated arrival estimates are future integrations.

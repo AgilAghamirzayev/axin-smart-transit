@@ -1,0 +1,95 @@
+1
+00:00:00,150 --> 00:00:05,359
+Axin uses a Next.js frontend, a modular Spring Boot backend, and a
+
+2
+00:00:05,359 --> 00:00:09,700
+database. Here is how a request flows through the system.
+
+3
+00:00:10,150 --> 00:00:16,174
+The frontend groups code by feature. React components handle journeys, maps, and
+
+4
+00:00:16,174 --> 00:00:22,198
+operator tools. Shared shadcn components provide controls, while Leaflet displays routes and
+
+5
+00:00:22,198 --> 00:00:22,700
+markers.
+
+6
+00:00:23,150 --> 00:00:29,425
+Browser requests pass through a same-origin Next.js proxy to Spring Boot. The
+
+7
+00:00:29,425 --> 00:00:35,700
+proxy restricts paths and applies timeouts. Live snapshots refresh every three seconds.
+
+8
+00:00:36,150 --> 00:00:42,404
+Backend packages follow business features. Controllers handle requests, services coordinate operations, and
+
+9
+00:00:42,404 --> 00:00:48,658
+policies calculate rules. Repositories handle database access, with some services also using
+
+10
+00:00:48,658 --> 00:00:49,700
+JDBC directly.
+
+11
+00:00:50,150 --> 00:00:56,925
+Flyway manages database migrations. The catalog loads from versioned open data. Reports,
+
+12
+00:00:56,925 --> 00:01:03,700
+alerts, vehicles, and assignments persist. Transactions and idempotency help prevent duplicate writes.
+
+13
+00:01:04,150 --> 00:01:10,172
+The journey engine checks nearby stops and directed route geometry. It prioritizes
+
+14
+00:01:10,172 --> 00:01:16,194
+fewer boardings. Arrival estimates add walking, simulated waiting, riding, and transfer time,
+
+15
+00:01:16,194 --> 00:01:17,700
+without live traffic.
+
+16
+00:01:18,150 --> 00:01:24,386
+Analytics combines fresh GPS with recent, unique crowd reports. Configurable thresholds determine
+
+17
+00:01:24,386 --> 00:01:30,621
+crowding. Sustained high crowding for ten minutes creates an alert; stale or
+
+18
+00:01:30,621 --> 00:01:32,700
+insufficient evidence resets continuity.
+
+19
+00:01:33,150 --> 00:01:39,172
+Operator and GPS endpoints use separate roles. Dispatch validates the line, full
+
+20
+00:01:39,172 --> 00:01:45,194
+trajectory, and reserve bus. A transaction protects assignment, saves history, and starts
+
+21
+00:01:45,194 --> 00:01:46,700
+the simulated vehicle.
+
+22
+00:01:47,150 --> 00:01:53,174
+Unit, integration, and browser tests are included, although the latest full suite
+
+23
+00:01:53,174 --> 00:01:59,198
+was not rerun. Real GPS, schedules, and calibrated arrival estimates are future
+
+24
+00:01:59,198 --> 00:01:59,700
+integrations.

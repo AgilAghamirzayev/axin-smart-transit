@@ -81,3 +81,7 @@ Söhbətdə əlavə olaraq avtomatik başlanğıc mövqeyi, 1 km-dən qısa səf
 Əvvəlki mərhələdə 46 backend, 16 frontend və 3 operator E2E testi keçib. Son dəyişikliklərdən sonra istifadəçinin testləri sürət üçün keçmək göstərişi əsasında tam suite təkrar işlədilməyib. Compile/build və seçilmiş lokal API/brauzer yoxlamaları aparılıb. Tarixi uğurlu nəticələr hazırkı commit üçün tam test zəmanəti deyil. Sınaq tarixçəsi [VERIFICATION.md](VERIFICATION.md)-dədir.
 
 AI kod, test və sənədlərin hazırlanmasına geniş töhfə verib; müstəqil insan code review-si aparıldığı iddia edilmir. Komanda təqdim olunan həllin məhdudiyyətlərini və əsas qərarlarını özü müdafiə etməlidir. Cursor/Copilot və ya istifadə olunması təsdiqlənməmiş başqa alətlərin adı istifadə edilmiş kimi göstərilmir.
+
+## Təqdimat videoları
+
+İstifadəçinin funksional və texniki video tələbi əsasında ingiliscə ssenari və qrafiklər Codex ilə hazırlandı. İlk AhaMotion sınağı müddət və vizual uyğunluq səbəbindən yekun təqdimata daxil edilmədi. Yekun videolarda tətbiqin ekran görüntüləri, Python/Pillow diaqramları, FFmpeg montajı və edge-tts vasitəsilə yaradılmış sintetik ingilis səsləndirməsi istifadə edildi. Funksional video 1:30, texniki video 2:00-dır. Səs mətni və altyazılar docs/videos/ qovluğundadır. Simulyasiya və ETA məhdudiyyətləri videolarda açıqlanır. YouTube nəşri istifadəçinin açıq göstərişi və Public seçimi ilə həyata keçirilir.

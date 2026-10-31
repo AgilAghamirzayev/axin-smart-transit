@@ -1,0 +1,71 @@
+1
+00:00:00,150 --> 00:00:06,196
+Meet Axin: smarter bus journeys in Baku, with useful insights for transport
+
+2
+00:00:06,196 --> 00:00:06,700
+operators.
+
+3
+00:00:07,150 --> 00:00:12,654
+First, search your destination. Use your location with permission, or choose another
+
+4
+00:00:12,654 --> 00:00:17,700
+starting point. Axin checks nearby boarding stops, not just the closest.
+
+5
+00:00:18,150 --> 00:00:24,450
+Compare up to three options, prioritizing fewer transfers. Tags highlight speed, crowding,
+
+6
+00:00:24,450 --> 00:00:29,700
+and fewer boardings. Trips under one kilometre become walking routes.
+
+7
+00:00:30,150 --> 00:00:35,905
+The map highlights your journey, boarding stops, transfers, and destination. Switch layers,
+
+8
+00:00:35,905 --> 00:00:40,700
+zoom, or find your location. Simulated buses follow route geometry.
+
+9
+00:00:41,150 --> 00:00:46,880
+Arrival time combines walking, waiting, riding, and transfers. The simulated fleet targets
+
+10
+00:00:46,880 --> 00:00:50,700
+six-minute intervals. Times are estimates, without live traffic.
+
+11
+00:00:51,150 --> 00:00:56,607
+Report low, medium, or high crowding. Reports are saved. Optional GPS participation
+
+12
+00:00:56,607 --> 00:01:00,700
+requires consent and estimates participating devices, not every passenger.
+
+13
+00:01:01,150 --> 00:01:07,480
+Operators monitor routes, fleet activity, and crowding. Ten minutes of qualifying high
+
+14
+00:01:07,480 --> 00:01:11,700
+crowding triggers an alert recommending an additional bus.
+
+15
+00:01:12,150 --> 00:01:17,019
+Select a line, complete trajectory, and eligible reserve bus. The server validates
+
+16
+00:01:17,019 --> 00:01:21,888
+and records the assignment. The bus starts in simulation; no physical bus
+
+17
+00:01:21,888 --> 00:01:22,700
+is dispatched.
+
+18
+00:01:23,150 --> 00:01:29,700
+Axin connects official open data and simulated movement for better-informed journeys.
