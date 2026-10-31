@@ -1,0 +1,51 @@
+services:
+  database:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: transit
+      POSTGRES_USER: transit
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:?Set DATABASE_PASSWORD in .env}
+    volumes:
+      - transit-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U transit -d transit"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: jdbc:postgresql://database:5432/transit
+      DATABASE_USER: transit
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      OPERATOR_PASSWORD: ${OPERATOR_PASSWORD:?Set OPERATOR_PASSWORD in .env}
+      TELEMETRY_PASSWORD: ${TELEMETRY_PASSWORD:?Set TELEMETRY_PASSWORD in .env}
+      SIMULATOR_ENABLED: ${SIMULATOR_ENABLED:-true}
+      NOMINAL_CAPACITY: ${NOMINAL_CAPACITY:-60}
+      HIGH_DURATION: ${HIGH_DURATION:-10m}
+      SIMULATION_HEADWAY_SECONDS: ${SIMULATION_HEADWAY_SECONDS:-360}
+      SIMULATION_SPEED_KMH: ${SIMULATION_SPEED_KMH:-23}
+      MIN_REPORTERS: ${MIN_REPORTERS:-3}
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      database:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+  frontend:
+    build: ./frontend
+    environment:
+      BACKEND_URL: http://backend:8080
+      HOSTNAME: 0.0.0.0
+      PORT: 3000
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+volumes:
+  transit-data:

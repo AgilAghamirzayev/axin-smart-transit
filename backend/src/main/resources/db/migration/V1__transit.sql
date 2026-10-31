@@ -1,0 +1,10 @@
+create table transit_route (id varchar(30) primary key, name varchar(120) not null, color varchar(10) not null);
+create table stop (id varchar(30) primary key, name varchar(120) not null, latitude double precision not null, longitude double precision not null);
+create table route_stop (route_id varchar(30) references transit_route(id), stop_id varchar(30) references stop(id), sequence_no integer not null, primary key(route_id, sequence_no));
+create table vehicle (id varchar(30) primary key, route_id varchar(30) not null references transit_route(id), latitude double precision not null, longitude double precision not null, progress_m double precision not null, speed_kmh double precision not null, observed_at timestamp with time zone not null, source varchar(20) not null);
+create table crowd_report (id varchar(36) primary key, vehicle_id varchar(30) not null references vehicle(id), route_id varchar(30) not null references transit_route(id), reporter_id varchar(36) not null, level varchar(10) not null, created_at timestamp with time zone not null);
+create index report_route_time on crowd_report(route_id, created_at);
+create index report_reporter_time on crowd_report(reporter_id, created_at);
+create table route_state (route_id varchar(30) primary key references transit_route(id), high_since timestamp with time zone, last_evaluated timestamp with time zone);
+create table alert (id varchar(36) primary key, route_id varchar(30) not null references transit_route(id), started_at timestamp with time zone not null, triggered_at timestamp with time zone not null, resolved_at timestamp with time zone, acknowledged_at timestamp with time zone);
+create index alert_route on alert(route_id, resolved_at);

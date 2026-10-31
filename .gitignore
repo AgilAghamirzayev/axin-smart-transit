@@ -1,0 +1,13 @@
+.tools/
+__pycache__/
+**/target/
+**/node_modules/
+**/.next/
+**/.env*
+!.env.example
+!**/.env.example
+data/
+*.log
+*.tsbuildinfo
+frontend/playwright-report/
+frontend/test-results/

@@ -1,0 +1,36 @@
+server:
+  port: 8080
+  compression:
+    enabled: true
+    mime-types: application/json
+    min-response-size: 2048
+spring:
+  datasource:
+    url: ${DATABASE_URL:jdbc:h2:file:./data/transit;MODE=PostgreSQL;DB_CLOSE_ON_EXIT=FALSE}
+    username: ${DATABASE_USER:sa}
+    password: ${DATABASE_PASSWORD:}
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+  sql:
+    init:
+      mode: never
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+transit:
+  nominal-capacity: ${NOMINAL_CAPACITY:60}
+  network-source: ${NETWORK_SOURCE:official}
+  simulation-headway-seconds: ${SIMULATION_HEADWAY_SECONDS:360}
+  simulation-speed-kmh: ${SIMULATION_SPEED_KMH:23}
+  simulator-enabled: ${SIMULATOR_ENABLED:true}
+  operator-password: ${OPERATOR_PASSWORD:local-demo-change-me}
+  telemetry-password: ${TELEMETRY_PASSWORD:local-gps-change-me}
+  gps-freshness: 60s
+  report-freshness: 2m
+  high-duration: ${HIGH_DURATION:10m}
+  min-reporters: ${MIN_REPORTERS:3}
+  high-ratio: 0.6
+  report-cooldown: 30s

@@ -1,0 +1,64 @@
+AXIN — SMART TRANSIT & CROWDSOURCING ENGINE
+Digital Challenge Azerbaijan 2026 · Yarımfinal
+Texniki izah sənədi | 31 oktyabr 2026 | Təqdimat versiyası
+
+1. MƏQSƏD VƏ ƏHATƏ
+Axın sərnişinə uyğun avtobus səfərini tapmağa, gəliş vaxtını izləməyə və sıxlığı bildirməyə; operatora isə xətt yükünü izləməyə və ehtiyat avtobus təyin etməyə imkan verən funksional prototipdir. Rəsmi açıq marşrut həndəsəsi və dayanacaq məlumatları istifadə olunur. Avtobus hərəkəti simulyasiyadır; canlı rəsmi GPS bağlantısı yoxdur.
+
+2. TEXNOLOGİYA VƏ ARXİTEKTURA
+Java 21, Spring Boot 3.5, Spring MVC/Security/Validation, JDBC və Flyway backend-i təşkil edir. Next.js 16 App Router, React, TypeScript, Tailwind CSS, shadcn/ui və Leaflet frontend-də istifadə olunur. Lokal rejim H2 fayl bazası, Docker Compose isə PostgreSQL 17 istifadə edir. Versiyalar pom.xml və package-lock.json ilə qeydə alınıb.
+
+Sistem modular monolith-dir: bir backend və bir baza prototipin transaction və yerləşdirmə ehtiyacını qarşılayır. Brauzer → Next.js same-origin API proxy → Spring Boot controller/service → JDBC → DB. Kataloq ayrıca yüklənir; canlı vəziyyət 3 saniyəlik polling ilə yenilənir. Scheduler simulyasiya mövqelərini və sıxlıq analitikasını hesablayır.
+
+3. FEATURE-BASED STRUKTUR
+Backend: network (kataloq/həndəsə), telemetry (GPS/simulyasiya), journey (səfər/ETA), crowding (bildiriş), presence (GPS iştirak nümunəsi), analytics (sıxlıq/anomaliya), dispatch (ehtiyat parkı/təyinat), passenger (sərnişin sorğuları), operator (qorunan əməliyyatlar), shared (konfiqurasiya/təhlükəsizlik/xətalar).
+Frontend: features/transit, passenger, journey, crowding, presence, operator; app routing/proxy; components/ui ortaq komponentlər; lib HTTP köməkçiləri.
+
+Controller HTTP müqaviləsini, service istifadə ssenarisini, policy hesablamanı idarə edir. Constructor injection və Clock test edilə bilən asılılıqlar yaradır. SQL əsasən repository sərhədindədir; bəzi əməliyyat servislərində birbaşa JDBC istifadə olunduğundan tam persistence izoləsiyası iddia edilmir. Parametrləşdirilmiş SQL, DTO validation və ayrıca xəta sərhədi tətbiq olunur.
+
+4. MƏLUMAT MƏNBƏLƏRİ
+AYNA KMZ: 239 unikal xətt nömrəsi, 243 variant, 270 ayrıca həndəsə. BakuBus CSV: 3600 dayanacaq. Dayanacaqların marşruta uyğunluğu 35 metr yaxınlıqla hesablanmış namizədlərdir; rəsmi dayanacaq ardıcıllığı və xidmət cədvəli deyil. 49 dayanacaq uyğunlaşmayıb. Kataloq versiyalanmış JSON şəklində repoda saxlanır; startup mənbə saytının işləməsindən asılı deyil.
+Azərbaycan Open Data xəritə qatı və OpenStreetMap fonu ayrıca seçimlərdir. Mənbə URL-ləri, idxal qaydaları və lisenziya qeydləri docs/DATA_SOURCES.md-dədir. Açıq əldə olunan məlumat üçün avtomatik olaraq məhdudiyyətsiz yenidən yayım hüququ iddia edilmir.
+
+5. SƏRNİŞİN AXINI VƏ SƏFƏR SEÇİMİ
+Brauzer icazə verərsə cari mövqe başlanğıc kimi götürülür; sərnişin başlanğıcı dayanacaq və ya xəritə vasitəsilə dəyişə bilər. Qeyri-dəqiq mövqe xəbərdarlıqla göstərilir. Təyinat axtarıla bilən dayanacaq sahəsindən seçilir.
+Planlaşdırıcı başlanğıcdan 800 metr daxilində xidmət edilən dayanacaqları, təyinatın 1000 metr yaxınlığındakı ən yaxın 8 xidmət edilən dayanacağı yoxlayır. Birbaşa və maksimum bir aktarmalı səfərlər hesablanır; aktarma dayanacaqları maksimum 250 metr aralıdır. Əsas prioritet minimum minik sayıdır: birbaşa variant varsa aktarmalı alternativlər göstərilmir. Sonra vaxt, sıxlıq və qənaət meyarlarının nəticələri birləşdirilir, dublikatlar çıxarılır və maksimum 3 kart təqdim olunur.
+Ən sürətli, az sıxlıq və qənaətli etiketləri nəticələr üzərindədir. Qənaət təsdiqlənmiş tarif deyil, az minik sayına əsaslanır. Sıxlıq UNKNOWN olduqda az sıxlıq etiketi verilmir. Birbaşa məsafə 1 km-dən azdırsa piyada səfər göstərilir. Xəritə yalnız seçilmiş səfərin minmə–düşmə hissələrini və təxmini piyada bağlantılarını çəkir.
+
+6. İSTİQAMƏT, SİMULYASİYA VƏ ETA
+Avtobuslar rəsmi polyline boyunca sürət × zaman qədər irəliləyir. Ayrı həndəsələr arasında süni uçuş yaradılmır. Açıq xətlər simulyasiyada terminalda geri dönür; sərnişin səfəri terminalı keçərək əks istiqamətdə davam etdirilmir. Təkrarlanan dayanacaq keçidlərində düzgün istiqamətli qısa hissə seçilir.
+Park ölçüsü dövrə uzunluğu, 23 km/saat simulyasiya sürəti və 360 saniyə hədəf interval əsasında hesablanır; hər həndəsədə minimum 2 avtobus saxlanılır. Bu, hər sorğuda dəqiq 6 dəqiqə gözləmə zəmanəti deyil. SIMULATION_HEADWAY_SECONDS və SIMULATION_SPEED_KMH konfiqurasiya olunur. Lokal yoxlamada park 4211 avtobus göstərib; bu, real Bakı parkının sayı deyil.
+
+Ümumi vaxt = piyada + avtobusu gözləmə + avtobusda gediş + hər aktarmaya 60 saniyə.
+Gediş vaxtı istiqamətli həndəsə məsafəsi / sürət ilə hesablanır. Gözləmə düzgün istiqamətdə gələn avtobusun mövqeyindən hesablanır. Çox aşağı sürətdə 18 km/saat plan sürəti istifadə edilir. Köhnə GPS üçün etibarlı ETA verilmir. Piyada məsafəsi düz məsafə × 1.25, sürət 1.25 m/s fərziyyəsidir; piyada yol şəbəkəsi hesablanmır. Dəqiqəyə ayrı-ayrı yuxarı yuvarlaqlaşdırma göstərilən hissələrin cəmində kiçik fərq yarada bilər; daxili hesab saniyə ilədir.
+Tıxac, işıqfor, dayanacaqda dayanma və real cədvəl modelə daxil deyil. Ekrandakı qeyri-müəyyənlik intervalı evristikdir, ölçülmüş statistik etibarlılıq deyil. Qısa gediş daha uzun gözləmə səbəbindən ümumi olaraq gec bitə bilər.
+
+7. SIXLIQ VƏ ANOMALİYA
+Son 2 dəqiqə ərzində fərqli anonim ID-lərin yalnız son bildirişi sayılır. Minimum 3 iştirakçı və ən azı 60% HIGH yüksək sıxlıq yaradır; avtobus GPS-i son 60 saniyədə aktual olmalıdır. Default qayda bu vəziyyətin 10 dəqiqə davam etməsidir. UNKNOWN/aşağı səviyyə və uzun scheduler fasiləsi davamlılığı sıfırlayır. Eyni epizod üçün bir xəbərdarlıq yaranır; baxıldı işarəsi sıxlığı həll etmir. Yeni epizod yenidən xəbərdarlıq yarada bilər.
+GPS iştirakı ayrıca açıq razılıq tələb edir. Maksimum 35m dəqiqlik və avtobusa 75m yaxınlıq, bir neçə ardıcıl ölçüm və zaman həddi ilə uyğunlaşma yoxlanır. Son 60 saniyənin iştirakçıları nominal 60 nəfər tutumla müqayisə olunur; 50% orta, 80% yüksək həddidir. Bu, bütün sərnişinlərin sayı deyil, könüllü cihaz nümunəsidir. Eyni yerdəki cihazların eyni avtobusda olması GPS ilə qəti sübut edilmir.
+
+8. OPERATOR VƏ EHTİYAT AVTOBUS
+Operator xətt sıxlığını, GPS iştirakını, bildirişləri və parkı izləyir. Xətt, tam trayektoriya və uyğun READY ehtiyat avtobus seçilərək təyinat verilir. Server xətt–trayektoriya–avtobus əlaqəsini, koordinatları, həndəsə bütövlüyünü və avtobusun hazır statusunu yoxlayır. Əlaqəsiz çoxhissəli həndəsələr birləşdirilmir; 5 km-dən böyük koordinat sıçrayışı bloklanır.
+Transaction/lock, requestId idempotency və 30 saniyə cooldown təkrar təyinatın qarşısını alır. Avtobus başlanğıcdan simulyasiyaya qoşulur, əməliyyat tarixçədə saxlanılır. Ehtiyat parkı və xətt uyğunluğu lokal simulyasiya qaydasıdır; açıq data real avtobus icazə reyestri vermir. Fiziki avtobusa əmr göndərilmir.
+
+9. DAVAMLILIQ, TƏHLÜKƏSİZLİK VƏ MƏXFİLİK
+Flyway V1–V6 sxem və kataloq miqrasiyalarını idarə edir. H2 faylı/PostgreSQL volume report, alert, vehicle və təyinat tarixçəsini saxlayır. Tam xam GPS tarixçəsi saxlanmır. Səfər hesablanması üçün başlanğıc koordinatları backend-ə ötürülür; presence ayrıca razılıqla işləyir və xam iştirak koordinatları bazaya yazılmır.
+Operator və GPS üçün ayrı Basic Auth rolları, BCrypt, proxy allowlist/timeout və input validation var. Operator parolu frontend yaddaşında saxlanılır. Demo parolları README-də yalnız lokal istifadə üçün göstərilir; Docker nümunəsində dəyişdirilməlidir. Anonim browser ID həqiqi şəxs identifikasiyası deyil. Production mərhələsi TLS, OIDC, abuse müdafiəsi, audit/retention və yük sınaqları tələb edir.
+
+10. QURAŞDIRMA VƏ NÜMAYİŞ
+Dəqiq Windows, Linux/macOS və Docker əmrləri kök README.md-dədir. Java 21 və Node.js 24 ilə backend 8080, frontend 3000 portunda başladılır. Windows üçün scripts/start-backend.ps1 və scripts/start-frontend-production.ps1 var. Nümayişdə təyinat axtarışı, səfər xəritəsi, sıxlıq göndərişi, operator girişi və ehtiyat avtobus təyinatı göstərilə bilər. 10 dəqiqəlik qaydanın demo skripti README-də izah edilir. Qısaldılmış demo müddəti istifadə olunarsa bu, açıq deyilməlidir.
+
+11. YOXLAMA VƏ QƏBUL
+JUnit/MockMvc, Vitest/Testing Library və Playwright testləri repodadır. Əvvəlki mərhələdə 46 backend, 16 frontend və 3 operator E2E testi keçib. Son GPS, səfər, park və UI dəyişikliklərindən sonra istifadəçinin sürət tələbi ilə tam avtomatlaşdırılmış suite yenidən işlədilməyib. Compile/build və seçilmiş lokal API/brauzer yoxlamaları aparılıb; bunlar tam regression yoxlamasını əvəz etmir. Docker/PostgreSQL yerləşdirməsinin bu mühitdə doğrulandığı iddia edilmir. Dəqiq tarixçə docs/VERIFICATION.md, tələb xəritəsi docs/ACCEPTANCE.md-dədir.
+
+12. GƏLƏCƏK İNKİŞAF
+Rəsmi GTFS/GTFS-RT və dayanacaq ardıcıllığı; real GPS/cədvəl inteqrasiyası; trafik və dwell məlumatı ilə ETA kalibrasiyası; piyada routing; təsdiqlənmiş tariflər; sərnişin sayğacları; real park uyğunluq reyestri; OIDC/audit/retention; geospatial indekslər; SSE/WebSocket və yük ölçmələri növbəti mərhələlərdir.
+
+13. TƏHVİL PAKETİ
+README.md — quraşdırma və arxitektura.
+docs/AI_DECLARATION.md — AI istifadəsi və istifadəçi promptları.
+docs/TECHNICAL_EXPLANATION.txt — bu sənəd; UTF-8, Notepad/Word ilə açılır.
+docs/ACCEPTANCE.md — FR-01–FR-10 və sənəd/test izlənəbilərliyi.
+docs/VERIFICATION.md — faktiki yoxlama qeydləri.
+docs/DATA_SOURCES.md — mənbələr və məhdudiyyətlər.
+Mənbə kodu GitHub reposunda təqdim olunur. AI istifadəsi gizlədilmir; müstəqil insan auditi aparıldığı iddia edilmir.
